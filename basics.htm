@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>GNU+Linux Command Line Basics</title>
+
+	<meta name="author" content="Daniel KNITTL-FRANK">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+	<style>
+		blink {
+			-webkit-animation: 1.5s linear infinite blink_effect;
+			animation: 1.5s linear infinite blink_effect;
+		}
+		@-webkit-keyframes blink_effect {
+			0% { visibility: hidden; }
+			50% { visibility: hidden; }
+			100% { visibility: visible; }
+		}
+		@keyframes blink_effect {
+			0% { visibility: hidden; }
+			50% { visibility: hidden; }
+			100% { visibility: visible; }
+		}
+
+		h2 a[name] { visibility:hidden; }
+		h2:hover a[name] { visibility:visible; }
+	</style>
+</head>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+	<symbol id="info-circle" viewBox="0 0 16 16">
+		<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+		<path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+	</symbol>
+	<symbol id="exclamation-triangle" viewBox="0 0 16 16">
+		<path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.15.15 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.2.2 0 0 1-.054.06.1.1 0 0 1-.066.017H1.146a.1.1 0 0 1-.066-.017.2.2 0 0 1-.054-.06.18.18 0 0 1 .002-.183L7.884 2.073a.15.15 0 0 1 .054-.057m1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767z"/>
+		<path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+	</symbol>
+</svg>
+
+<div class="container py-4">
+
+<h1>GNU+Linux Command Line Basics</h1>
+
+<div class="xrow">
+	<ul class="nav justify-content-center nav-fill">
+		<li class="nav-item"><a class="nav-link" href="#basics">Basics</a></li>
+		<li class="nav-item"><a class="nav-link" href="#paths">Filesystem Navigation</a></li>
+		<li class="nav-item"><a class="nav-link" href="#files">Working with Files and Directories</a></li>
+		<li class="nav-item"><a class="nav-link" href="#text">Text Processing</a></li>
+		<li class="nav-item"><a class="nav-link" href="#io">I/O Redirection</a></li>
+		<li class="nav-item"><a class="nav-link" href="#grep">Text Search</a></li>
+		<li class="nav-item"><a class="nav-link" href="#permissions">Permissions</a></li>
+		<li class="nav-item"><a class="nav-link" href="#apt">Package management</a></li>
+	</ul>
+
+	<div class="text-justify">
+
+		<hr />
+
+		<h2>Intro</h2>
+
+		<p>Most <abbr title="GNU's Not Unix">GNU</abbr>+Linux distributions come with a POSIX-compatible shell, which acts as a <abbr title="Command Line Interface">CLI</abbr> and allows users to enter command lines or to run scripts. For most distributions the default shell for interactive user sessions is the <code>bash</code> shell. You will often find <code>zsh</code> as well, which is also by MacOS amongst others. This document focuses on commands and concepts that are available in most POSIX-compatible shells.</p>
+
+		<div class="alert alert-info d-flex align-items-center" role="alert">
+			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-circle"/></svg>
+			<p class="mb-0">Sometimes, multiple implementations with subtle differences exist of the same program. Notable examples include <code>find</code> and <code><abbr title="netcat">nc</abbr></code>. Such implementations are often referred to by "GNU" or "<abbr title="Berkeley Software Distribution">BSD</abbr>" implementation. Consult the man pages on a particular system if you are unsure.</p>
+		</div>
+
+		<hr />
+
+		<h2>Basics <a href="#basics" name="basics">🔗</a></h2>
+
+		<div class="accordion mb-3" id="commands-help">
+			<div class="accordion-item">
+				<h2 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commands-help-body" aria-expanded="false" aria-controls="commands-help-body">
+						Commands
+					</button>
+				</h2>
+				<div id="commands-help-body" class="accordion-collapse collapse" data-bs-parent="#commands-help">
+					<div class="accordion-body">
+						<dl class="row mb-0">
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/man">man</a></code></dt>
+							<dd class="col-10"><b>man</b>ual for binary</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/apropos">apropos</a></code></dt>
+							<dd class="col-10">find manual pages for for keywords</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/help">help</a></code></dt>
+							<dd class="col-10"><b>help</b> for builtin</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/echo">echo</a></code></dt>
+							<dd class="col-10">display a line of text</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/date">date</a></code></dt>
+							<dd class="col-10">print <b>date</b> and time</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<p>GNU+Linux is generally case-sensitive. Consequently, command names and file names must be entered exactly as shown; <code>readme.TXT</code> and <code>README.txt</code> are two distinct files.</p>
+
+		<h3>Prompt</h3>
+
+		<p>Usually, shells display a prompt string (<code>PS1</code>) when waiting for users to enter their command line. The prompt string can be as simple as a single dollar sign, but generally it is configured to include useful information such as the logged in user, host name, and working directory.</p>
+
+		<p>For regular users, the prompt string ends with <code>$</code>; and with <code>#</code> for the <code>root</code> user (the system administrator):</p>
+
+		<pre class="card card-body text-bg-dark"><code>username@hostname:/path/to/working/directory$ <blink>_</blink>
+</code></pre>
+
+		<p>Command lines are submitted by pressing the return/enter key <kbd>↲</kbd>. Upon submission, the shell parses the command line and executes the command(s).</p>
+
+		<div class="alert alert-info d-flex align-items-center" role="alert">
+			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-circle"/></svg>
+			<p class="mb-0">Online tutorials or sample commands usually prefix lines to be entered into the CLI with <code>$</code> only. This document follows that convention.</p>
+		</div>
+
+		<h5>Useful Keyboard Shortcuts</h5>
+
+		<p>Most of the time, the GNU <code>readline</code> library is used to read input from the user. Readline supports many keyboard shortcuts, including but not limited to:</p>
+
+		<dl class="row">
+			<dt class="col-2"><kbd><abbr title="TAB">⇥</abbr></kbd> or <kbd>Ctrl</kbd> <kbd>I</kbd></dt><dd class="col-10">Trigger autocompletion for commands, options, and file names.</dd>
+			<dt class="col-2"><kbd><abbr title="Up">↑</abbr></kbd> and <kbd><abbr title="Down">↓</abbr></kbd></dt><dd class="col-10">Scroll through command history</dd>
+			<dt class="col-2"><kbd>Ctrl</kbd> <kbd>R</kbd></dt><dd class="col-10">Reverse search through command history</dd>
+			<dt class="col-2"><kbd>Ctrl</kbd> <kbd>W</kbd></dt><dd class="col-10">Delete/cut word (white space boundary)</dd>
+			<dt class="col-2"><kbd>Alt</kbd> <kbd><abbr title="Backspace">⌫</abbr></kbd></dt><dd class="col-10">Delete/cut word (alphanumeric characters)</dd>
+			<dt class="col-2"><kbd>Ctrl</kbd> <kbd>Y</kbd></dt><dd class="col-10">Paste word</dd>
+			<dt class="col-2"><kbd>Alt</kbd> <kbd>Y</kbd></dt><dd class="col-10">Cycle through paste buffer</dd>
+			<dt class="col-2"><kbd>Ctrl</kbd> <kbd>L</kbd></dt><dd class="col-10">Clear screen</dd>
+			<dt class="col-2"><kbd>Ctrl</kbd> <kbd>_</kbd></dt><dd class="col-10">Undo text input</dd>
+		</dl>
+
+		<p>Other useful keyboard shortcuts:</p>
+
+		<dl class="row">
+			<dt class="col-2"><kbd>Shift</kbd> <kbd><abbr title="Page Up">⇞</abbr></kbd></dt><dd class="col-10">Scroll up</dd>
+			<dt class="col-2"><kbd>Shift</kbd> <kbd><abbr title="Page Down">⇟</abbr></kbd></dt><dd class="col-10">Scroll down</dd>
+			<dt class="col-2"><kbd>Ctrl</kbd> <kbd>C</kbd></dt><dd class="col-10">Interrupt (terminate) the foreground process</dd>
+			<dt class="col-2"><kbd>Ctrl</kbd> <kbd>Z</kbd></dt><dd class="col-10">Stop (pause) the foreground process</dd>
+			<dt class="col-2"><kbd>Ctrl</kbd> <kbd>D</kbd></dt><dd class="col-10">EOF when entering text; or logout</dd>
+		</dl>
+
+		<h3>Command Structure</h3>
+
+		<p>Most commands follow the same pattern: the first word in the command line specifies the binary (program) to execute, optionally followed by parameters. Parameters can be program options or paths to files or directories. Options usually start with a single or two dashes.</p>
+
+		<pre class="card card-body text-bg-dark"><code>$ program -o --option file1 /path/to/another/file</code></pre>
+
+		<p>Binaries are located in the directories from the environment variable <code>PATH</code>, unless the command name contains a slash.</p>
+
+		<p>Comments can be introduced by prepending text with a hash (<code>#</code>). Everything after the hash is ignored by the shell. This is especially useful in scripts:</p>
+
+		<pre class="card card-body text-bg-dark"><code>$ echo 'Hello RISC!' # this is a comment
+Hello RISC!
+$ # When is next Monday? (print email format)
+$ date -d 'next monday' --rfc-email
+Mon, 29 Sep 2025 00:00:00 +0200</code></pre>
+
+		<p>Short options (with a single dash) can be combined for most binaries: <code>program -x -y -z</code> is equivalent to <code>program -xyz</code>; but <code>ls --all</code> is different from <code>ls -all</code>, which is equivalent to <code>ls -a -l -l</code>.</p>
+
+		<p>All commands and their options are case-sensitive, for instance <code>ls -a</code> is different from <code>ls -A</code>.</p>
+
+		<p>Every command comes with a user manual. Use the program <code>man</code> to display and read those system reference manuals:</p>
+
+		<pre class="card card-body text-bg-dark"><code>$ man man # display the manual for the program "man" (the manual pager)
+$ man echo # display the manual for the program "echo"</code></pre>
+
+		<p>The <em>Synopsis</em> section shows how a command must be called and which combinations of parameters are valid.</p>
+
+		<p>When viewing the User manuals (often called <em>man pages</em>), the keyboard can be used to scroll and search:</p>
+
+		<dl class="row">
+			<dt class="col-2"><kbd>q</kbd></dt>
+			<dd class="col-10"><b>Q</b>uit (return to the shell)</dd>
+
+			<dt class="col-2"><kbd>/</kbd></dt>
+			<dd class="col-10">Forward search</dd>
+
+			<dt class="col-2"><kbd>?</kbd></dt>
+			<dd class="col-10">Backward search</dd>
+
+			<dt class="col-2"><kbd>n</kbd></dt>
+			<dd class="col-10">Jump to <b>n</b>ext match</dd>
+
+			<dt class="col-2"><kbd>N</kbd></dt>
+			<dd class="col-10">Jump to previous match</dd>
+		</dl>
+
+		<div class="alert alert-info d-flex align-items-center" role="alert">
+			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-circle"/></svg>
+			<p class="mb-0">In the QWERTY keyboard layout, both <kbd>/</kbd> and <kbd>?</kbd> share the same physical key.</p>
+		</div>
+
+		<p>To get help about the shell's <em>builtins</em>, run <code>help</code>, e.g. <code>help cd</code>.</p>
+
+		<hr />
+
+		<h2>Filesystem Navigation <a href="#paths" name="paths">🔗</a></h2>
+
+		<div class="accordion mb-3" id="commands-paths">
+			<div class="accordion-item">
+				<h2 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commands-paths-body" aria-expanded="false" aria-controls="commands-paths-body">
+						Commands
+					</button>
+				</h2>
+				<div id="commands-paths-body" class="accordion-collapse collapse" data-bs-parent="#commands-paths">
+					<div class="accordion-body">
+						<dl class="row mb-0">
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/cd">cd</a></code></dt>
+							<dd class="col-10"><b>c</b>hange <b>d</b>irectory</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/p">pwd</a></code></dt>
+							<dd class="col-10"><b>p</b>rint <b>w</b>orking <b>d</b>irectory</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/ls">ls</a></code></dt>
+							<dd class="col-10"><b>l</b>i<b>s</b>t directory contents</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/cat">cat</a></code></dt>
+							<dd class="col-10">con<b>cat</b>enate files and print on standard output</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/less">less</a></code></dt>
+							<dd class="col-10">show long text in a pager</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<p>Directories are organized hierarchically in a tree structure. The <em>root</em> directory in this hierarchy is designated as <code>/</code>. Every other file and directory of a system is nested in this directory or its subdirectories. File and directory names are case-sensitive.</p>
+
+		<p>Paths can be categorized into two types:</p>
+
+		<dl class="row">
+			<dt class="col-2">Absolute</dt>
+			<dd class="col-10">Always start with a slash (<code>/</code>). They are valid independent of the current working directory and always describe the same file. Think of them as "addresses". (paths starting with <code>~</code> are expanded by the shell to start with the home directory of the user).</dd>
+
+			<dt class="col-2">Relative</dt>
+			<dd class="col-10">All other paths (not starting with a slash). They depend on the current working directory. Have them start with <code>./</code> to explicitly show that they are relative to the current directory (<code>.</code>). Think of them as "signposts" guiding your way to to the target</dd>
+		</dl>
+
+		<p>Hidden files (and directories) have names starting with a period (<code>.</code>), e.g. <code>.profile</code>.</p>
+
+		<p>To get the absolute path of the current directory, one can use the <code>pwd</code> command to <b>p</b>rint the <b>w</b>orking <b>d</b>irectory. <code>ls</code> will <b>l</b>i<b>s</b>t the content of a directory (current directory by default) and <code>cd</code> allows <b>c</b>hanging <b>d</b>irectories.</p>
+
+		<p>To view the content of a (text) file, use the <code>cat</code> command to output the raw content of the file to the terminal. For longer files, <code>less</code> is recommended, which allows paging through the file. It uses the same shortcuts as <code>man</code> &ndash; in fact, man pages are actually displayed by the <code>less</code> binary.</p>
+
+		<h3>Notable Files and Paths</h3>
+
+		<dl class="row">
+			<dt class="col-2"><code>.</code></dt>
+			<dd class="col-10">The current directory</dd>
+
+			<dt class="col-2"><code>..</code></dt>
+			<dd class="col-10">The parent directory</dd>
+
+			<dt class="col-2"><code>/dev/null</code></dt>
+			<dd class="col-10">A special device file which discards any data written to it</dd>
+
+			<dt class="col-2"><code>/dev/random</code></dt>
+			<dd class="col-10">A special device file which produces random bytes</dd>
+		</dl>
+
+		<p><a href="https://linux.die.net/man/7/hier"><code>man hier</code></a> contains a list of commonly available directories on a GNU+Linux system and their purpoes, as defined by the <abbr title="Filesystem Hierarchy Standard">FHS</abbr>.</p>
+
+		<h2>Working with Files and Directories <a href="#files" name="files">🔗</a></h2>
+
+		<div class="accordion mb-3" id="commands-files">
+			<div class="accordion-item">
+				<h2 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commands-files-body" aria-expanded="false" aria-controls="commands-files-body">
+						Commands
+					</button>
+				</h2>
+				<div id="commands-files-body" class="accordion-collapse collapse" data-bs-parent="#commands-files">
+					<div class="accordion-body">
+						<dl class="row mb-0">
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/touch">touch</a></code></dt>
+							<dd class="col-10">create empty files or update modification time of existing files</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/mkdir">mkdir</a></code></dt>
+							<dd class="col-10"><b>m</b>a<b>k</b>e <b>dir</b>ectory</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/rm">rm</a></code></dt>
+							<dd class="col-10"><b>r</b>e<b>m</b>ove files</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/rmdir">rmdir</a></code></dt>
+							<dd class="col-10"><b>r</b>e<b>m</b>ove empty <b>dir</b>ectories</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/cp">cp</a></code></dt>
+							<dd class="col-10"><b>c</b>o<b>p</b>y files and directories</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/mv">mv</a></code></dt>
+							<dd class="col-10"><b>m</b>o<b>v</b>e (or rename) files and directories</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/ln">ln</a></code></dt>
+							<dd class="col-10">create <b>l</b>i<b>n</b>ks to files and directories</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<p>Use <code>touch</code> and <code>mkdir</code> to create empty files and directories, respectively. Both commands support creating multiple files at once. To create nested directory hierarchies, <code>mkdir -p</code> is quite useful.</p>
+
+		<p>To remove files again, use the <code>rm</code> command. <code>rmdir</code> removes empty directories. To remove non-empty directories including their files and subdirectories, <code>rm -r</code> can be used.</p>
+
+		<div class="alert alert-danger d-flex align-items-center" role="alert">
+			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle"/></svg>
+			<p class="mb-0">There is no confirmation when deleting or overwriting files!</p>
+		</div>
+
+		<div class="alert alert-danger d-flex align-items-center" role="alert">
+			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle"/></svg>
+			<p class="mb-0">Deletion is final. There is no trash or recycle bins to recover files from!</p>
+		</div>
+
+		<p>Both <code>cp</code> and <code>mv</code> commands support two forms: a two-parameter form and a 3+ parameter form. <code>mv src dst</code> moves <code>src</code> to <code>dst</code>, whereas <code>mv src1 src2 srcN dst</code> moves all <code>src…</code> files into the <code>dst</code> directory.</p>
+
+		<p>To copy directories including their files and subdirectories, call <code>cp</code> with the <code>-R</code> or <code>-r</code> option.</p>
+
+		<h3>Wildcards</h3>
+
+		<p>It is often useful to specify groups of files. Shells offer this possibility via “wildcards” or “globs”.</p>
+
+		<dl class="row">
+			<dt class="col-2"><code>?</code></dt>
+			<dd class="col-10">exactly one character</dd>
+
+			<dt class="col-2"><code>*</code></dt>
+			<dd class="col-10">arbitrary many characters (even no characters)</dd>
+
+			<dt class="col-2"><code>[xyz]</code></dt>
+			<dd class="col-10">exactly one character: either x, y, or z</dd>
+
+			<dt class="col-2"><code>[0-9]</code></dt>
+			<dd class="col-10">exactly one digit</dd>
+
+			<dt class="col-2"><code>[a-f]</code></dt>
+			<dd class="col-10">exactly one character between a and f, inclusive</dd>
+
+			<dt class="col-2"><code>[0-9a-fA-F]</code></dt>
+			<dd class="col-10">exactly one hexadecimal digit</dd>
+
+			<dt class="col-2"><code>[!…]</code></dt>
+			<dd class="col-10">exactly one character not in the set, i.e. the complement set</dd>
+		</dl>
+
+		<p>Wildcards are expanded by the shell to a list of matching paths. Binaries never see the wildcard metacharacters, but only the expanded list. If a glob character needs to be passed to a binary verbatim, it must be escaped with a backslash (<kbd>\</kbd>) or surrounded by quotes (<kbd>'</kbd>). Escaping and quoting protect the glob pattern from being expanded.</p>
+
+		<p>Wildcards only match within a directory; they never match the slash directory separator (<code>/</code>).</p>
+
+		<p>The leading period of hidden files is not matched by wildcards either. If hidden files need to be matched, the period must be specified explicitly in the pattern.</p>
+
+		<h5>Examples</h5>
+
+		<dl class="row">
+			<dt class="col-2"><code>*.pdf</code></dt>
+			<dd class="col-10">All (non-hidden) PDF files in the current directory</dd>
+
+			<dt class="col-2"><code>_*</code></dt>
+			<dd class="col-10">All file names that start with an underscore</dd>
+
+			<dt class="col-2"><code>*risc*</code></dt>
+			<dd class="col-10">All (non-hidden) files that contain <code>risc</code> in their name</dd>
+
+			<dt class="col-2"><code>*</code></dt>
+			<dd class="col-10">All non-hidden files in the current directory</dd>
+
+			<dt class="col-2"><code>* .*</code></dt>
+			<dd class="col-10">All files in the current directory, including hidden files</dd>
+
+			<dt class="col-2"><code>*/</code></dt>
+			<dd class="col-10">All non-hidden directories</dd>
+
+			<dt class="col-2"><code>/home/*[0-9]/</code></dt>
+			<dd class="col-10">All home directories ending in a digit</dd>
+
+			<dt class="col-2"><code>????.txt</code></dt>
+			<dd class="col-10">All non-hidden text files with exactly 8 characters in length (4 + 1 + 3)</dd>
+
+			<dt class="col-2"><code>[!aeiou]*</code></dt>
+			<dd class="col-10">All non-hidden files that do not start with a lower-case vowel</dd>
+		</dl>
+
+		<div class="alert alert-info d-flex align-items-center" role="alert">
+			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-circle"/></svg>
+			<p class="mb-0">Some shells implement additional expansion patterns. One such shell is <code>bash</code> which implements <em>Brace Expansion</em>. With brace expansion  <code>{x,y}{19..21}</code> expands into <code>x19 x20 x21 y19 y20 y21</code>, independent of any existing files.</p>
+		</div>
+
+		<h2>Text Processing <a href="#text" name="text">🔗</a></h2>
+
+		<div class="accordion mb-3" id="commands-text">
+			<div class="accordion-item">
+				<h2 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commands-text-body" aria-expanded="false" aria-controls="commands-text-body">
+						Commands
+					</button>
+				</h2>
+				<div id="commands-text-body" class="accordion-collapse collapse" data-bs-parent="#commands-text">
+					<div class="accordion-body">
+						<dl class="row mb-0">
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/wc">wc</a></code></dt>
+							<dd class="col-10"><b>w</b>ord <b>c</b>ount</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/head">head</a></code></dt>
+							<dd class="col-10">Show first part of input</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/tail">tail</a></code></dt>
+							<dd class="col-10">Show last part of input</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/cut">cut</a></code></dt>
+							<dd class="col-10">Print selected columns of files</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/sort">sort</a></code></dt>
+							<dd class="col-10">Sort input</dd>
+
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/uniq">uniq</a></code></dt>
+							<dd class="col-10">Only print <b>uniq</b>ue lines</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<p>GNU+Linux comes with many powerful tools to transform and filter text-based data. Most programs operate on lines, reading the input line by line and printing the processed output. Input files are generally not modified.</p>
+
+		<h4>Counting Lines and Words</h4>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p><code>wc</code> counts the number of lines, words, and bytes.</p>
+				<p><code>wc -l</code> prints the line count only, <code>wc -w</code> prints the word count, and <code>wc -c</code> prints the byte count.</p>
+			</div>
+
+			<div class="col-md-6">
+				<pre class="card card-body text-bg-dark"><code>$ cat file
+this file contains
+three lines and
+just nine words.
+
+$ wc file
+ 3  9 52 file
+
+$ wc -l file
+3 file
+
+$ wc -w file
+9 file
+
+$ wc -c file
+52 file</code></pre>
+			</div>
+		</div>
+
+		<h4>Start and End of Text</h4>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p><code>head</code> and <code>tail</code> print the first or last part of an input, respectively. The default is to show 10 lines, which can be changed with the <code>-n</code> option.</p>
+				<p><code>head -n3</code> or <code>head -3</code> will only show the first 3 lines. Negating the number will print everything except the last N lines: <code>head -n-3</code> will exclude the last 3 lines of the file.</p>
+				<p><code>tail -n3</code> or <code>tail -3</code> will only show the last 3 lines. <code>tail -n+3</code> will skip the first 2 lines (printing line 3 until the end).</p>
+			</div>
+
+			<div class="col-md-6">
+				<pre class="card card-body text-bg-dark"><code>$ cat file
+one
+two
+three
+four
+five
+
+$ head -2 file
+one
+two
+
+$ head -n-2 file
+one
+two
+three
+
+$ tail -n2 file
+four
+five
+
+$ tail -n+2 file
+two
+three
+four
+five</code></pre>
+			</div>
+		</div>
+
+		<h4>Extracting Fields</h4>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p><code>cut</code> extracts fields or characters from a text. Select fields and fields ranges with <code>-f</code> or characters and character ranges with <code>-c</code>. Omitting one side of a range selects all fields/characters from the start or until the end of the line. The default field delimiter is the tab character, but it can be changed with <code>-d</code>. cut always outputs the fields in the same order as the input.</p>
+
+				<p>If you have a colon-delimited file and you want to print the first three and the seventh field, run <code>cut -d: -f1-3,7</code>. To extract the first ten characters of every line, run <code>cut -c1-10</code>.</p>
+			</div>
+
+			<div class="col-md-6">
+				<pre class="card card-body text-bg-dark"><code>$ cat file
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+
+$ cut -d: -f1,7 file
+root:/bin/bash
+daemon:/usr/sbin/nologin
+bin:/usr/sbin/nologin
+sys:/usr/sbin/nologin
+
+$ cut -d: -f-4 file
+root:x:0:0
+daemon:x:1:1
+bin:x:2:2
+sys:x:3:3
+
+$ cut -d: -f6- file
+/root:/bin/bash
+/usr/sbin:/usr/sbin/nologin
+/bin:/usr/sbin/nologin
+/dev:/usr/sbin/nologin</code></pre>
+			</div>
+		</div>
+
+		<h4>Sorting</h4>
+
+		<div class="alert alert-info d-flex align-items-center" role="alert">
+			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-circle"/></svg>
+			<p class="mb-0">Sort order depends on the active <em>locale</em>. If a specific sort order is required, you can override the locale by setting the <code>LC_ALL</code> variable: <code>LC_ALL=C sort …</code>.</p>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>Use <code>sort</code> to sort the lines of an input alphabetically. <code>-r</code> reverses the sort direction.</p>
+
+				<p>Switch to numerical sorting with the <code>-n</code> option; non-numeric input is interpreted as the value <code>0</code>.</p>
+
+				<p>For multi-field inputs, specify the field separator with <code>-t</code> (default: non-blank to blank transition). Specify the sort keys with <code>-k</code>.. Sort keys are specified as <code>KEYDEF</code>, which specifies the start and stop position plus any options. If the stop position is missing, the rest of the line is used!</p>
+
+				<p>The default sort algorithm is not stable! If stable sorting is required, pass <code>-s</code>.</p>
+
+				<p><code>--debug</code> prints detailed information about the keys used and the sort process.</p>
+			</div>
+
+			<div class="col-md-6">
+				<pre class="card card-body text-bg-dark"><code>$ cat file
+a:12049:h
+C:19685:Q
+-3:12540:w
+D:24790:X
+2:12357:z
+10:12185:j
+1:9970:h
+b:23926:f
+A:24790:Y
+
+$ sort file
+-3:12540:w
+10:12185:j
+1:9970:h
+2:12357:z
+A:24790:Y
+C:19685:Q
+D:24790:X
+a:12049:h
+b:23926:f
+
+$ sort -n file
+-3:12540:w
+A:24790:Y
+C:19685:Q
+D:24790:X
+a:12049:h
+b:23926:f
+1:9970:h
+2:12357:z
+10:12185:j
+
+$ sort -t: -k2n file
+1:9970:h
+a:12049:h
+10:12185:j
+2:12357:z
+-3:12540:w
+C:19685:Q
+b:23926:f
+A:24790:Y
+D:24790:X
+
+$ sort -t: -k2n -k1,1rf file
+1:9970:h
+a:12049:h
+10:12185:j
+2:12357:z
+-3:12540:w
+C:19685:Q
+b:23926:f
+D:24790:X
+A:24790:Y</code></pre>
+			</div>
+		</div>
+
+		<h4>Removing Duplicates</h4>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p><code>uniq</code> removes repeated lines from a text. Repeated lines are only removed if they are adjacent.</p>
+
+				<p><code>uniq -c</code> counts repeated lines, prepending each output line with the number of repetitions. This format allows reconstructing the original text. It is also useful for quick frequency analyses of inputs.</p>
+
+				<p><code>uniq -d</code> prints only lines with repetitions and <code>uniq -u</code> prints only lines without.</p>
+			</div>
+
+			<div class="col-md-6">
+				<pre class="card card-body text-bg-dark"><code>$ cat file
+a
+r
+r
+a
+y
+
+$ cat sorted-file
+a
+a
+r
+r
+y
+
+$ uniq file
+a
+r
+a
+y
+
+$ uniq sorted-file
+a
+r
+y
+
+$ uniq -c file
+      1 a
+      2 r
+      1 a
+      1 y
+
+$ uniq -c sorted-file
+      2 a
+      2 r
+      1 y
+
+$ uniq -d sorted-file
+a
+r
+
+$ uniq -u sorted-file
+y</code></pre>
+			</div>
+		</div>
+
+		<hr />
+
+		<h2><abbr title="Input/Output">I/O</abbr> Redirection <a href="#io" name="io">🔗</a></h2>
+
+		<p>Input and output of commands can be redirected from and to files, or passed to a second process. The redirection is set up by the shell when starting the process. Programs do not need to implement anything themselves; redirection happens transparently.</p>
+
+		<p>Being able to combine input and output of arbitrary commands unlocks the true potential of the command line!</p>
+
+		<dl class="row">
+			<dt class="col-12"><code>&lt; file</code></dt>
+			<dt class="col-2"><code>&lt;0 file</code></dt>
+			<dd class="col-10">Read file as (standard) input (STDIN).</dd>
+
+			<dt class="col-12"><code>&gt; file</code></dt>
+			<dt class="col-2"><code>1&gt; file</code></dt>
+			<dd class="col-10">(Standard) output (STDOUT) of the command is redirected into the file. Existing files are truncated.</dd>
+
+			<dt class="col-12"><code>&gt;&gt; file</code></dt>
+			<dt class="col-2"><code>1&gt;&gt; file</code></dt>
+			<dd class="col-10">(Standard) output of the command is appended to the file.</dd>
+
+			<dt class="col-2"><code>2&gt; file</code></dt>
+			<dd class="col-10">(Standard) error (STDERR) of the command is redirected into the file. Existing files are truncated.</dd>
+
+			<dt class="col-2"><code>2&gt;&gt; file</code></dt>
+			<dd class="col-10">(Standard) error is appended to the file.</dd>
+
+			<dt class="col-2"><code>2&gt;&amp;1</code></dt>
+			<dd class="col-10">Duplicate standard error from current standard output. Order of redirection operators matter, to redirect both stdout and stderr into a single file, use <code>&gt; file 2&gt;&amp;1</code></dd>
+
+			<dt class="col-2"><code>|</code></dt>
+			<dd class="col-10">Pipe the output of the left command to the input of the right command. Multiple pipes and commands can be chained.</dd>
+
+			<dt class="col-2"><code>$(cmd)</code></dt>
+			<dd class="col-10"><em>Command substitution</em>: The output of the command will be inserted into the command line in place of the parenthised expression. Alternatively, backticks can be used: <code>`cmd`</code>.</dd>
+		</dl>
+
+		<div class="alert alert-danger d-flex align-items-center" role="alert">
+			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle"/></svg>
+			<p class="mb-0">There is no confirmation when overwriting existing files!</p>
+		</div>
+
+		<h5>Examples</h5>
+
+		<dl>
+			<dt><code>ls | less</code></dt>
+			<dd> Scroll a long directory listing</dd>
+			<dt><code>grep 'a' file | sort | uniq -c | sort -n</code></dt>
+			<dd> Count frequency of all lines containing the letter 'a'</dd>
+			<dt><code>find 2&gt; /dev/null</code></dt>
+			<dd> Find files and discard error messages</dd>
+			<dt><code>ping localhost &gt;&gt; pings</code></dt>
+			<dd> Append output of <code>ping</code> to a file</dd>
+			<dt><code>echo "You executed $(wc -l &lt; ~/.bash_history) commands"</code></dt>
+			<dd> Print a message about your shell usage</dd>
+		</ul>
+
+		<hr />
+
+		<h2>Text Search <a href="#grep" name="grep">🔗</a></h2>
+
+		<div class="accordion mb-3" id="commands-grep">
+			<div class="accordion-item">
+				<h2 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commands-grep-body" aria-expanded="false" aria-controls="commands-grep-body">
+						Commands
+					</button>
+				</h2>
+				<div id="commands-grep-body" class="accordion-collapse collapse" data-bs-parent="#commands-grep">
+					<div class="accordion-body">
+						<dl class="row mb-0">
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/grep">grep</a></code></dt>
+							<dd class="col-10">grep (<b>g</b>lobal <b>r</b>egex <b>p</b>rint)</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<p>GNU+Linux comes with programs to perform efficient and effective text search. The most popular is probably <a href="http://linux.die.net/man/1/grep"><code>grep</code></a>. Grep leverages <em>Regular Expressions</em> (a.k.a. re, regex, regexp) to find patterns in files or text. Every line that matches the pattern is printed; lines not matching the pattern are omitted from the output.</p>
+
+		<p>There are different flavors/implementations of Regular Expressions and <code>grep</code> parses the search pattern as <abbr title="Basic Regular Expression">BRE</abbr> by default. BREs only support a minimal set of meta characters. <code>grep -E</code> parses the pattern as <abbr title="Extended Regular Expression">ERE</abbr>.</p>
+
+		<dl class="row">
+			<dt class="col-2"><code>.</code></dt>
+			<dd class="col-10">One arbitrary character (except line breaks)</dd>
+
+			<dt class="col-12"><code>[xyz]</code></dt>
+			<dt class="col-12"><code>[0-9]</code></dt>
+			<dt class="col-2"><code>[a-f0-9xyz]</code></dt>
+			<dd class="col-10">One arbitrary character from the list or range</dd>
+
+			<dt class="col-2"><code>[^xyz]</code></dt>
+			<dd class="col-10">One arbitrary character from the complement set of the list or range</dd>
+
+			<dt class="col-2"><code>^</code></dt>
+			<dd class="col-10">Anchor the pattern at beginning of the line</dd>
+
+			<dt class="col-2"><code>$</code></dt>
+			<dd class="col-10">Anchor the pattern at the end of the line</dd>
+
+			<dt class="col-2"><code>*</code></dt>
+			<dd class="col-10">The preceding expression can be repeated or omitted</dd>
+
+			<dt class="col-2"><code>?</code></dt>
+			<dd class="col-10">The preceding expression is optional <span class="badge text-bg-secondary">ERE</span></dd>
+
+			<dt class="col-2"><code>+</code></dt>
+			<dd class="col-10">The preceding expression is mandatory and can be repeated <span class="badge text-bg-secondary">ERE</span></dd>
+
+			<dt class="col-2"><code>{N}</code></dt>
+			<dd class="col-10">The preceding expression must be repeated <code>N</code> times <span class="badge text-bg-secondary">ERE</span></dd>
+
+			<dt class="col-12"><code>{0,N}</code></dt>
+			<dt class="col-2"><code>{,N}</code> <span class="badge text-bg-secondary">GNU</span></dt>
+			<dd class="col-10">The preceding expression may be repeated at most <code>N</code> times <span class="badge text-bg-secondary">ERE</span></dd>
+
+			<dt class="col-2"><code>{N,}</code></dt>
+			<dd class="col-10">The preceding expression must be repeated at least <code>N</code> times <span class="badge text-bg-secondary">ERE</span></dd>
+
+			<dt class="col-2"><code>{M,N}</code></dt>
+			<dd class="col-10">The preceding expression must be repeated at least <code>M</code> and at most <code>N</code> times <span class="badge text-bg-secondary">ERE</span></dd>
+
+			<dt class="col-2"><code>()</code></dt>
+			<dd class="col-10">Group subexpressions <span class="badge text-bg-secondary">ERE</span></dd>
+
+			<dt class="col-2"><code>|</code></dt>
+			<dd class="col-10">Specify alternatives <span class="badge text-bg-secondary">ERE</span></dd>
+		</dl>
+
+		<p>Grep's behavior can be additionally controlled through options:</p>
+
+		<dl class="row">
+			<dt class="col-2"><code>-i</code></dt> <dd class="col-10"><b>I</b>gnore case</dd>
+			<dt class="col-2"><code>-v</code></dt> <dd class="col-10">In<b>v</b>ert: only print lines without match</dd>
+			<dt class="col-2"><code>-o</code></dt> <dd class="col-10"><b>O</b>nly print matching part of lines</dd>
+			<dt class="col-2"><code>-c</code></dt> <dd class="col-10"><b>C</b>ount number of matches per file</dd>
+			<dt class="col-2"><code>-n</code></dt> <dd class="col-10">Show line <b>n</b>umber of matches</dd>
+			<dt class="col-2"><code>-h</code></dt> <dd class="col-10"><b>H</b>ide file names</dd>
+			<dt class="col-2"><code>-l</code></dt> <dd class="col-10"><b>L</b>list file names only</dd>
+			<dt class="col-2"><code>-q</code></dt> <dd class="col-10"><b>Q</b>uiet mode (no output)</dd>
+			<dt class="col-2"><code>-r</code></dt> <dd class="col-10">Search directories <b>r</b>ecursively</dd>
+			<dt class="col-2"><code>-A N</code></dt> <dd class="col-10">Show N lines <b>A</b>fter each match <span class="badge text-bg-secondary">GNU</span> <span class="badge text-bg-secondary">BSD</span></dd>
+			<dt class="col-2"><code>-B N</code></dt> <dd class="col-10">Show N lines <b>B</b>efore each match <span class="badge text-bg-secondary">GNU</span> <span class="badge text-bg-secondary">BSD</span></dd>
+			<dt class="col-2"><code>-C N</code></dt> <dd class="col-10">Show N <b>C</b>ontext lines around each match <span class="badge text-bg-secondary">GNU</span> <span class="badge text-bg-secondary">BSD</span></dd>
+		</dl>
+
+		<div class="alert alert-info d-flex align-items-center" role="alert">
+			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-circle"/></svg>
+			<p class="mb-0">Because some regex meta characters conflict with shell glob characters, the general recommendation is to quote the pattern of the grep command</p>
+		</div>
+
+		<h5>Examples</h5>
+
+		<dl>
+			<dt><code>grep ':/bin/sh$' /etc/passwd</code></dt>
+			<dd>Find users with <code>/bin/sh</code> as Login-Shell (the last field contains the login shell)</dd>
+			<dt><code>grep -E 'seriali[sz](ed?|ing|ations?)'</code></dt>
+			<dd>Find American and British spelling of words</dd>
+			<dt><code>grep -ic 'RISC'</code></dt>
+			<dd>Count occurrences of 'RISC' in files, ignoring case</dd>
+			<dt><code>grep -o '[-+]\?[0-9]*'</code></dt>
+			<dd>Extract numbers from a text</dd>
+			<dt><code>grep -e 'risc' -e 'RISC'</code></dt>
+			<dd>Find 'risc' and 'RISC' (but not 'Risc' or 'RiSC')</dd>
+			<dt><code>grep -B1 '^=' </code></dt>
+			<dd>Find headings in a markdown document by including the line preceding the markup</dd>
+			<dt><code>grep -v '^$' </code></dt>
+			<dd>Omit empty lines: print non-empty lines only</dd>
+			<dt><code>grep -v '^ *#' </code></dt>
+			<dd>Print non-comment lines for languages such as Python</dd>
+		</dl>
+
+		<hr />
+
+		<h2>Permissions <a href="#permissions" name="permissions">🔗</a></h2>
+
+		<div class="accordion mb-3" id="commands-permissions">
+			<div class="accordion-item">
+				<h2 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commands-permissions-body" aria-expanded="false" aria-controls="commands-permissions-body">
+						Commands
+					</button>
+				</h2>
+				<div id="commands-permissions-body" class="accordion-collapse collapse" data-bs-parent="#commands-permissions">
+					<div class="accordion-body">
+						<dl class="row mb-0">
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/id">id</a></code></dt> <dd class="col-10">Print user and group IDs</dd>
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/stat">stat</a></code></dt> <dd class="col-10">Display file <b>stat</b>us</dd>
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/chmod">chmod</a></code></dt> <dd class="col-10"><b>ch</b>ange file mode bits</dd>
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/chown">chown</a></code></dt> <dd class="col-10"><b>ch</b>ange file owner and group</dd>
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/sudo">sudo</a></code></dt> <dd class="col-10">execute a command as another user (<b>s</b>ubstitute <b>u</b>ser <b>do</b>)</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<p>Permissions in GNU+Linux always apply to the file data itself. Not to the file name (!) &ndash; this becomes relevant when a file has multiple hard links.</p>
+
+		<p>Permissions can be applied to different users:</p>
+
+		<dl class="row">
+			<dt class="col-2"><u>u</u>ser</dt><dd class="col-10">the user who owns the file.</dd>
+			<dt class="col-2"><u>g</u>roup</dt><dd class="col-10">users in the file's group.</dd>
+			<dt class="col-2"><u>o</u>thers</dt><dd class="col-10">other users not in the file's group (sometimes called “world”).</dd>
+		</dl>
+
+		<p>Each user can be assigned the following permissions:</p>
+
+		<dl class="row">
+			<dt class="col-2"><u>r</u>ead <span class="badge text-bg-secondary">4</span></dt>
+			<dd class="col-10">
+				<ul>
+					<li>File content can be read.</li>
+					<li>Directory content can be listed.</li>
+				</ul>
+			</dd>
+			<dt class="col-2"><u>w</u>rite <span class="badge text-bg-secondary">2</span></dt>
+			<dd class="col-10">
+				<ul>
+					<li>File content can be written.</li>
+					<li>Files can be created/deleted/moved inside a directory.</li>
+				</ul>
+			</dd>
+			<dt class="col-2">e<u>x</u>ecute <span class="badge text-bg-secondary">1</span></dt>
+			<dd class="col-10">
+				<ul>
+					<li>Files can be executed.</li>
+					<li>Can change to directory and its subdirectories; can access files inside directory.</li>
+				</ul>
+			</dd>
+		</dl>
+
+		<p>The numeric values allow representing all three permissions as a single octal digit: simply sum the values all active permissions. To designate a number as octal, prepend it with <code>0</code>, e.g. <code>0644</code> for user=readwrite,group=read,others=read).</p>
+
+		<p>To display the permissions of files in both symbolic and octal notation, execute <code>stat</code> with the file(s) as parameter.</p>
+
+		<p>The additional permission "Set User-ID" (SUID bit) has the kernel execute a program always with the permission of its owner. This is required for certain tasks, such as changing your own password. The SUID bit is displayed as a lower-case <code>s</code> in place of the user's execute permission, e.g. <code>rws-r-xr-x</code>.</p>
+
+		<p>Permissions of a file are changed with the <code>chmod</code> command, which allows specifying the new permissions as octal number or in symbolic notation.</p>
+
+		<div class="alert alert-info d-flex align-items-center" role="alert">
+			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-circle"/></svg>
+			<p class="mb-0">Only the owner of a file (and <code>root</code>) can change the permissions of a file.</p>
+		</div>
+
+		<p>The root user can change the owner and the group of a file with the <code>chown</code> command. Owner and group are separated with a colon (<code>:</code>).</p>
+
+		<div class="alert alert-info d-flex align-items-center" role="alert">
+			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-circle"/></svg>
+			<p class="mb-0">Only <code>root</code> can change the owner and group of a file!</p>
+		</div>
+
+		<p><code>sudo</code> is a mechanism to execute commands as a different user (most commonly as <code>root</code>), without having to share passwords. Unless specified otherwise via <code>-u</code>, the default user is <code>root</code>. Configuration of who can execute what is configured via the <code>/etc/sudoers</code> file, see <a href="https://linux.die.net/man/5/sudoers"><code>man 5 sudoers</code></a>.</p>
+
+		<p>User names and password digests are stored in the files <code>/etc/passwd</code> and <code>/etc/shadow</code>. (<a href="https://linux.die.net/man/5/passwd"><code>man 5 passwd</code></a>, <a href="https://linux.die.net/man/5/shadow"><code>man 5 shadow</code></a>)</p>
+
+		<h5>Examples</h5>
+
+		<dl>
+			<dt><code>stat file</code></dt><dd>Show the permissions of the file.</dd>
+			<dt><code>chmod u+x file</code></dt><dd>Make the file executable for its user.</dd>
+			<dt><code>chmod 0777 file</code></dt><dd>Enable all permissions for the file (not recommended!)</dd>
+			<dt><code>chmod u=rwx,go-w file</code></dt><dd>Enable all permissions for the user (owner) of the file, remove write permissions of group and others.</dd>
+			<dt><code>chown dfalkner:risc file</code></dt><dd>Change file owner to 'dfalker' and file group to 'risc'.</dd>
+		</dl>
+
+		<hr />
+
+		<h2>Package management <a href="#apt" name="apt">🔗</a></h2>
+
+		<div class="accordion mb-3" id="commands-apt">
+			<div class="accordion-item">
+				<h2 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commands-apt-body" aria-expanded="false" aria-controls="commands-apt-body">
+						Commands
+					</button>
+				</h2>
+				<div id="commands-apt-body" class="accordion-collapse collapse" data-bs-parent="#commands-apt">
+					<div class="accordion-body">
+						<dl class="row mb-0">
+							<dt class="col-2"><code><a href="http://linux.die.net/man/8/apt">apt</a></code></dt>
+							<dd class="col-10"><b>A</b>dvanced <b>P</b>ackage <b>T</b>ool</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<p>Software on GNU+Linux systems is mostly managed through <em>package managers</em>. Package managers provide access to a large repository of software packages. Elevated permissions are required to install or configure packages; generally only the <code>root</code> user can install or uninstall software.</p>
+
+		<p>Package repository configuration is done via the directories in <code>/etc/apt</code>, mostly by adding files to <code>/etc/apt/sources.list.d/</code> to add additional repositories.</p>
+
+		<h5>Examples</h5>
+
+		<dl>
+			<dt><code>apt update &amp;&amp; apt upgrade</code></dt><dd>Update catalog and install upgrades</dd>
+			<dt><code>apt install nginx</code></dt><dd>Install the nginx webserver</dd>
+			<dt><code>apt remove firefox</code></dt><dd>Uninstall the Firefox browser</dd>
+		</dl>
+
+		<hr />
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+</body>
+</html>
