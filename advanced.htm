@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>GNU+Linux Command Line Advanced Topics</title>
+
+	<meta name="author" content="Daniel KNITTL-FRANK">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+	<style>
+		h2 a[name] { visibility:hidden; }
+		h2:hover a[name] { visibility:visible; }
+
+		.text-justify { text-align: justify; }
+	</style>
+</head>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+	<symbol id="info-circle" viewBox="0 0 16 16">
+		<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+		<path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+	</symbol>
+	<symbol id="exclamation-triangle" viewBox="0 0 16 16">
+		<path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.15.15 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.2.2 0 0 1-.054.06.1.1 0 0 1-.066.017H1.146a.1.1 0 0 1-.066-.017.2.2 0 0 1-.054-.06.18.18 0 0 1 .002-.183L7.884 2.073a.15.15 0 0 1 .054-.057m1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767z"/>
+		<path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+	</symbol>
+</svg>
+
+<div class="container py-4">
+
+<h1>GNU+Linux Command Line Basics</h1>
+
+<div class="xrow">
+	<ul class="nav justify-content-center nav-fill">
+		<li class="nav-item"><a class="nav-link" href="#pkg">Package management</a></li>
+		<li class="nav-item"><a class="nav-link" href="#net">Networking</a></li>
+		<li class="nav-item"><a class="nav-link" href="#find">Find</a></li>
+		<li class="nav-item"><a class="nav-link" href="#ssh">SSH</a></li>
+		<li class="nav-item"><a class="nav-link" href="#tools">Tools</a></li>
+		<li class="nav-item"><a class="nav-link" href="#scripting">Scripting</a></li>
+
+	</ul>
+
+	<hr/>
+
+	<div class="text-justify">
+
+		<h2>Package management <a href="#pkg" name="pkg">🔗</a></h2>
+
+		<div class="accordion mb-3" id="commands-apt">
+			<div class="accordion-item">
+				<h3 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commands-apt-body" aria-expanded="false" aria-controls="commands-apt-body">
+						Commands
+					</button>
+				</h3>
+				<div id="commands-apt-body" class="accordion-collapse collapse show" data-bs-parent="#commands-apt">
+					<div class="accordion-body">
+						<dl class="row mb-0">
+							<dt class="col-2"><code><a href="http://linux.die.net/man/8/apt">apt</a></code></dt>
+							<dd class="col-10"><b>A</b>dvanced <b>P</b>ackage <b>T</b>ool</dd>
+							<dt class="col-2"><code><a href="https://manpages.debian.org/testing/snapd/snap.8.en.html">snap</a></code></dt>
+							<dd class="col-10">snap</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<p>Software on GNU+Linux systems is mostly managed through <em>package managers</em>. Package managers provide access to a large repository of software packages. Elevated permissions are required to install or configure packages; generally only the <code>root</code> user can install or uninstall software.</p>
+
+		<h3>APT</h3>
+
+		<p>Package repository configuration for systems using <code>apt</code> is done via the directories in <code>/etc/apt</code>, mostly by adding files to <code>/etc/apt/sources.list.d/</code> to add and enable additional repositories.</p>
+
+		<p>Repositories (on Ubuntu) are categorized into the following components:</p>
+
+		<dl class="row">
+			<dt class="col-md-2"><code>main</code></dt>
+			<dd class="col-md-10">Officially supported software</dd>
+			<dt class="col-md-2"><code>restricted</code></dt>
+			<dd class="col-md-10">Supported software that is not available under a completely free license</dd>
+			<dt class="col-md-2"><code>universe</code></dt>
+			<dd class="col-md-10">Community maintained software</dd>
+			<dt class="col-md-2"><code>multiverse</code></dt>
+			<dd class="col-md-10">Software that is not free</dd>
+		</dl>
+
+		<p>Additionally, updates are split across the following repositories:</p>
+
+		<dl class="row">
+			<dt class="col-md-2"><code>security</code></dt>
+			<dd class="col-md-10">Important security updates</dd>
+			<dt class="col-md-2"><code>updates</code></dt>
+			<dd class="col-md-10">Recommended updates</dd>
+			<dt class="col-md-2"><code>backports</code></dt>
+			<dd class="col-md-10">Unsupported updates (updates from newer versions of Ubuntu)</dd>
+			<dt class="col-md-2"><code>proposed</code></dt>
+			<dd class="col-md-10">Pre-release updates (will eventually be moved to <code>updates</code>)</dd>
+		</dl>
+
+		<h4 class="h5">Examples</h4>
+
+		<dl>
+			<dt><code>apt update &amp;&amp; apt upgrade</code></dt><dd>Update catalog and install upgrades</dd>
+			<dt><code>apt install nginx</code></dt><dd>Install the nginx webserver</dd>
+			<dt><code>apt remove firefox</code></dt><dd>Uninstall the Firefox browser</dd>
+		</dl>
+
+		<h3>Snap</h3>
+
+		<p>Canonical (the company behind Ubuntu) provides an additional tool to to install self-contained packages, called <em>snap</em>. Snap can be (and is) used alongside .deb packages installed via <code>apt</code>.</p>
+
+		<p>A single snap package might be provided through different <em>channels</em>, which allows users to easily switch to a different version of the same software (say to an extended support release or to a beta version).</p>
+
+		<p>By default, snaps are sandboxed and have limited access to the system. Certain packages require full system access and need to installed with <em>classic confinement</em>.</p>
+
+		<h4 class="h5">Examples</h4>
+
+		<dl>
+			<dt><code>snap info firefox</code></dt><dd>Show information about the Firefox snap</dd>
+			<dt><code>snap install firefox</code></dt><dd>Install Firefox</dd>
+			<dt><code>snap refresh firefox --channel=latest/beta</code></dt><dd>Switch Firefox snap to the beta version</dd>
+			<dt><code>snap remove firefox</code></dt><dd>Remove the Firefox snap</dd>
+			<dt><code>snap install code --classic</code></dt><dd>Install VS Code with classic confinement (full system access!)</dd>
+		</dl>
+
+		<hr />
+
+
+		<h3>Docker builds</h3>
+
+		<p>Docker is a software which allows containerizing applications, as well as providing a specific environment when building software.</p>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>Each instruction in a Dockerfile (e.g. <code>RUN</code>) creates a new <em>layer</em>. Consequently, once a file is part of a layer, removing it later in a different layer will <em>not</em> reduce the image size.
+				Thus, when installing packages in a Dockerfile, make sure to remove any temporary files and caches within the same instruction:</p>
+			</div>
+
+			<div class="col-md-6">
+				<pre class="card card-body text-bg-dark"><code>RUN apt update \
+	&amp;&amp; apt install -y package-to-install \
+	&amp;&amp; rm -rf /var/cache/apt/archives/ /var/lib/apt/lists/*</code></pre>
+			</div>
+		</div>
+
+		<p>Docker will also cache layers and only rebuild the layers that have changed. This means that it pays off to think about order of instructions, when writing a Dockerfile: keep instructions that change infrequently to the front and move the dynamic parts to the back.</p>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>When building Docker images for later distribution, you usually want it to only contain the build artifacts and runtime dependencies required to run your software. You don't want to ship the compiler infrastructure or the source code of your software. That's where multistage builds come in.</p>
+
+				<p>By providing multiple <code>FROM</code> instructions in a single Dockerfile, a multistage build is performed. Later stages can copy files from earlier stages, but only the last stage will be part of the final image.</p>
+			</div>
+
+			<div class="col-md-6">
+				<pre class="card card-body text-bg-dark"><code>FROM eclipse-temurin:25-jdk AS builder
+WORKDIR /opt/app
+COPY mvnw pom.xml src/ ./
+RUN ./mvnw clean install
+
+FROM eclipse-temurin:25-jre
+WORKDIR /opt/app
+EXPOSE 8080
+COPY --from=builder /opt/app/target/app.jar /opt/app/app.jar
+ENTRYPOINT ["java", "-jar", "/opt/app/app.jar"]</code></pre>
+			</div>
+		</div>
+
+		<h4 class="h5">Links</h4>
+
+		<ul>
+			<li><a href="https://docs.docker.com/build/building/best-practices/">Best practices</a></li>
+			<li><a href="https://docs.docker.com/build/building/multi-stage/">Multi-stage</a></li>
+		</ul>
+
+		<hr/>
+
+
+		<h2>Networking <a href="#net" name="net">🔗</a></h2>
+
+		<div class="accordion mb-3" id="commands-network">
+			<div class="accordion-item">
+				<h3 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commands-network-body" aria-expanded="false" aria-controls="commands-network-body">
+						Commands
+					</button>
+				</h3>
+				<div id="commands-network-body" class="accordion-collapse collapse show" data-bs-parent="#commands-network">
+					<div class="accordion-body">
+						<dl class="row mb-0">
+							<dt class="col-md-2"><code><a href="http://linux.die.net/man/8/ping">ping</a></code></dt>
+							<dd class="col-md-10">Send ICMP ECHO_REQUEST to network hosts</dd>
+
+							<dt class="col-md-2"><code><a href="http://linux.die.net/man/8/mtr">mtr</a></code></dt>
+							<dd class="col-md-10">A network diagnostic tool combining <code>traceroute</code> and <code>ping</code></dd>
+
+							<dt class="col-md-2"><code><a href="http://linux.die.net/man/1/dig">dig</a></code></dt>
+							<dd class="col-md-10">DNS lookup utility</dd>
+
+							<dt class="col-md-2"><code><a href="http://linux.die.net/man/1/nc">nc</a></code></dt>
+							<dd class="col-md-10"><b>n</b>et<b>c</b>at, perform arbitrary network requests</dd>
+
+							<dt class="col-md-2"><code><a href="http://linux.die.net/man/8/ss">ss</a></code></dt>
+							<dd class="col-md-10">dump <b>s</b>ocket <b>s</b>tatistics</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<p>Inevitably, you will run into network and connectivity issues sooner or later. Several tools can be used to perform common troubleshooting tasks.</p>
+
+		<p><code>ping</code> sends <abbr title="Internet Control Message Protocol">ICMP</abbr> messages to a given host and waits for the host to respond. Since you can't assume the <abbr title="Domain Name System">DNS</abbr> to be working, it is often a good idea to ping well-known IP addresses, such as <code>8.8.8.8</code> (Google DNS) or 1.1.1.1 (Cloudflare DNS).</p>
+
+		<p><code>mtr</code> combines <code>ping</code> and <code>traceroute</code>: it pings all hosts on the route to a given host and records response times and packet loss rates for each hop. Pressing <kbd>d</kbd> cycles trough a textual and two visual display modes.</p>
+
+		<p>To check DNS (mis)configuration, use the tool <code>dig</code> or <code>nslookup</code>. To resolve the IP address of the host <code>example.com</code>, use <code>dig example.com +short</code> or <code>dig @8.8.8.8 example.com +short</code> to execute the DNS query against a specific or custom DNS server.</p>
+
+		<p>If an application does not start because the port is already in use, <code>ss</code> can shed light. Most commonly, it is called with the five option flags <code>-plunt</code> (show ports, show listening sockets, show UDP sockets, do not resolve service names, show TCP sockets) to show both TCP and UDP connections and listening sockets.</p>
+
+		<p>If your application cannot connect to a remote service, such as a database, but the remote host responds to ping and DNS is working, it can be helpful to connect to the service's port directly. This can be achived with <code>nc</code> or <code>telnet</code>, which can open a connection to arbitrary ports on remote hosts.</p>
+
+		<h4 class="h5">Examples</h4>
+
+		<dl>
+			<dt><code>ping 8.8.8.8</code></dt><dd>Ping Google's DNS server</dd>
+			<dt><code>mtr 8.8.8.8</code></dt><dd>Measure response times and packet loss at each hop to the destination</dd>
+			<dt><code>dig example.com +short</code></dt><dd>Resolve IP address of host example.com</dd>
+			<dt><code>dig @1.1.1.1 example.com +short</code></dt><dd>Resolve IP address of host example.com, using Cloudflare's DNS server</dd>
+			<dt><code>ss -plunt</code></dt><dd>Show used ports of the local system</dd>
+			<dt><code>printf 'GET / HTTP/1.1\r\nhost:example.com\r\n\r\n' | nc example.com 80</code></dt><dd>Send a raw HTTP request to example.com</dd>
+		</dl>
+
+		<hr/>
+
+
+		<h2>Find <a href="#find" name="find">🔗</a></h2>
+
+		<div class="accordion mb-3" id="commands-find">
+			<div class="accordion-item">
+				<h3 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commands-find-body" aria-expanded="false" aria-controls="commands-find-body">
+						Commands
+					</button>
+				</h3>
+				<div id="commands-find-body" class="accordion-collapse collapse show" data-bs-parent="#commands-find">
+					<div class="accordion-body">
+						<dl class="row mb-0">
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/find">find</a></code></dt>
+							<dd class="col-10">Find files</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<p>Use <code>find</code> to find files in your local file system and filter them with conditions or execute actions on them</p>
+
+		<p>All conditions must match for a file to be printed, unless combining them with <code>-o</code>. Group conditions with <code>'('</code> and <code>')'</code> and negate a condition with <code>'!'</code>. The following conditions are commonly used; for a full list consult the man page.<p>
+
+		<dl class="row">
+			<dt class="col-md-2"><code>-name</code></dt>
+			<dd class="col-md-10">Filter by name (case-sensitive)</dd>
+
+			<dt class="col-md-2"><code>-iname</code></dt>
+			<dd class="col-md-10">Filter by name (case-insensitive)</dd>
+
+			<dt class="col-md-2"><code>-size</code></dt>
+			<dd class="col-md-10">Filter by size</dd>
+
+			<dt class="col-md-2"><code>-type</code></dt>
+			<dd class="col-md-10">Filter by type (f=file, d=directory)</dd>
+
+			<dt class="col-md-2"><code>-empty</code></dt>
+			<dd class="col-md-10">Filter empty files or directories</dd>
+
+			<dt class="col-md-2"><code>-writable</code></dt>
+			<dd class="col-md-10">Filter writable files or directories</dd>
+
+			<dt class="col-md-2"><code>-readable</code></dt>
+			<dd class="col-md-10">Filter readable files or directories</dd>
+
+			<dt class="col-md-2"><code>-executable</code></dt>
+			<dd class="col-md-10">Filter executable files or directories</dd>
+
+			<dt class="col-md-2"><code>-mtime N</code></dt>
+			<dd class="col-md-10">Filter for files or directory whose data was modified <code>N*24</code> hours ago</dd>
+
+			<dt class="col-md-2"><code>-ctime N</code></dt>
+			<dd class="col-md-10">Filter for files or directory whose status was modified <code>N*24</code> hours ago</dd>
+
+			<dt class="col-md-2"><code>-mmin N</code>, <code>-cmin N</code></dt>
+			<dd class="col-md-10">Filter for files or directory whose date/status was modified <code>N</code> minutes ago</dd>
+		</dl>
+
+		<p>Numeric arguments for conditions can be prefixed with <code>+</code> or <code>-</code> to check for greater-than or less-than, respectively.</p>
+
+		<p>The default action for a matched file is to print its path, but it's possible to define custom actions to perform on the matches:</p>
+
+		<dl class="row">
+			<dt class="col-md-2"><code>-delete</code></dt>
+			<dd class="col-md-10">Delete matched files (without confirmation!)</dd>
+
+			<dt class="col-md-2"><code>-exec command {} ';'</code></dt>
+			<dd class="col-md-10">Execute the specified command for each matched file. Make sure to escape or quote the terminating semicolon.</dd>
+
+			<dt class="col-md-2"><code>-exec command {} +</code></dt>
+			<dd class="col-md-10">Similar to above, but pass multiple files to the specified command at once.</dd>
+		</dl>
+
+		<h4 class="h5">Examples</h4>
+
+		<dl>
+			<dt><code>find /tmp -type f</code></dt><dd>Find all regular files in directory <code>/tmp</code></dd>
+			<dt><code>find -type d -empty</code></dt><dd>Find empty directories</dd>
+			<dt><code>find -type f -ctime +365 -delete</code></dt><dd>Delete files older than 1 year</dd>
+			<dt><code>find -size +1000M</code></dt><dd>Find files larger than 1000 megabytes</dd>
+			<dt><code>find -cmin -5</code></dt><dd>Find files modified in the last 5 minutes</dd>
+			<dt><code>find -iname '*.txt' -exec cat {} ';'</code></dt><dd>Find all text files and print their content (calling <code>cat</code> once per file)</dd>
+			<dt><code>find '(' -iname '*.txt' -o -iname '*.md' ')' -exec cat {} +</code></dt><dd>Find all text or markdown files and print their content (calling <code>cat</code> only as often as required)</dd>
+		</dl>
+
+		<hr/>
+
+
+		<h2>SSH (Secure Shell) <a href="#ssh" name="ssh">🔗</a></h2>
+
+		<div class="accordion mb-3" id="commands-ssh">
+			<div class="accordion-item">
+				<h3 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commands-ssh-body" aria-expanded="false" aria-controls="commands-ssh-body">
+						Commands
+					</button>
+				</h3>
+				<div id="commands-ssh-body" class="accordion-collapse collapse show" data-bs-parent="#commands-find">
+					<div class="accordion-body">
+						<dl class="row mb-0">
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/ssh">ssh</a></code></dt>
+							<dd class="col-10">OpenSSH SSH client</dd>
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/ssh-keygen">ssh-keygen</a></code></dt>
+							<dd class="col-10">Generate SSH keys</dd>
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/ssh-copy-id">ssh-copy-id</a></code></dt>
+							<dd class="col-10">Upload public key to server</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<p>SSH allows connecting to remote host securely over an encrypted connection. By using public and private keys, you can authenticate with a remote server without sharing any passwords.</p>
+
+		<div class="alert alert-danger d-flex align-items-center" role="alert">
+			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle"/></svg>
+			<p class="mb-0">Stating the obvious: Keep your private keys private and do <strong>not</strong> share them!</p>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>Create a key pair and copy it to a remote server with two simple commands. It's generally safe to generate keys with the default options, but can easily be customized. The public part of a key pair is stored in a file with extension <code>.pub</code> (e.g. <code>~/.ssh/id_ed25519.pub</code>).</p>
+				<p>When copying your public key to a server, you will be prompted for your password. It's also possible to manually copy the <em>public</em> key to the server, e.g. by sending it via email to the server admin. The public keys which allow authenticating with a server account are stored in <code>~/.ssh/authorized_keys</code> (one key per line)</p>
+			</div>
+			<div class="col-md-6">
+				<pre class="card card-body text-bg-dark"><code>ssh-keygen</code></pre>
+				<pre class="card card-body text-bg-dark"><code>ssh-copy-id server.name.or.ip.address</code></pre>
+			</div>
+		</div>
+
+		<p>SSH connections also allow forwarding local or remote ports, tunneling the data through the secure connection. Use <code>ssh -L1337:example.com:80</code> to forward the local port 1337 to port 80 of host example.com, and <code>ssh -R1337:example.com:80</code> to forward the remote port 1337 to port 80 of host example.com. This can be especially useful when forwarding connections to the local client or to the SSH server itself, by specifying <code>localhost</code> as the target address.</p>
+
+		<p>SSH keys are only available on the local host, but they can be automatically be made available on remote hosts by specifying the <code>-A</code> option when connecting to the server or by adding <code>ForwardAgent yes</code> to the host connection configuration in <code>~/.ssh/config</code>.</p>
+
+		<p>Not only does SSH allow interactive remote sessions, but the protocol allows copying files to and from servers too. <code>scp</code> (<b>s</b>ecure <b>c</b>o<b>p</b>y) is the command to use here. Commonly used options are <code>-r</code> to copy directories recursively (including their content) and <code>-C</code> to compress files before sending.</p>
+
+		<p>While scp suffices for the simple use cases, <code>rsync</code> offers more options and flexibility, such as only transferring changed files or making sure remote directories match the local directories exactly. Common options are <code>-a</code> (archive), <code>-u</code> (update), <code>--delete</code>, and <code>-z</code> (compress). <code>rsync</code> can also be used to synchronize two local directories and does not necessarily need to involve a remote server.</p>
+
+		<p>When working with long-running tasks, you might want to start a task on a server and only return (hours or days) later to check its progress. Useful tools to handle such tasks are <code>screen</code> and <code>tmux</code>, both offering similar functionality. They are <em>terminal multiplexers</em> and allow running multiple sessions in a single session. Additionally, they keep their child processes running, even if you disconnect from the system. With screen, you'd use <code>screen -r</code> to reattach to a previous session and with tmux, you'd run <code>tmux attach</code>. If you don't have them available and only need to run a program even after disconnecting, consider <code>nohup</code> (no hang-up).</p>
+
+		<p>To quickly see running processes on a (local or remote) system, run <code>top</code> (interactive, <kbd>?</kbd> to bring up help) or <code>ps aux</code> (snapshot).</p>
+
+		<p>If a process gets stuck or does not respond, and needs to be terminated, you can use the command <code>kill</code> to send one of several signals to the process. Run <code>kill -l</code> to get a list of available signals on your system. Without specifying the signal, 15 (SIGTERM) will be the default. If that still didn't terminate the process, you can use the (uncatchable) signal 9 (SIGKILL), which forcefully stops and removes the process.</p>
+
+		<h4 class="h5">Examples</h4>
+
+		<dl>
+			<dt><code>ssh -A username@server</code></dt><dd>Connect as <code>username</code> to <code>server</code> and enable agent forwarding</dd>
+			<dt><code>ssh -L1337:internal:80 server</code></dt><dd>Connect to server and forward the local port 1337 to port 80 of host <code>internal</code> (reachable from server).</dd>
+			<dt><code>ssh -R8080:localhost:80 server</code></dt><dd>Connect to server and forward the the remote port 8080 to your local port 80 (your client).</dd>
+			<dt><code>scp *.jpg server:photos/</code></dt><dd>Quickly copy all JPG files in the current directory to the server</dd>
+			<dt><code>rsync -a --delete --compress project/ server:/path/to/project/</code></dt><dd>Synchronize local directory to remote directory (deleting files on the target)</dd>
+			<dt><code>nohup long-running-job &gt;&gt; ~/log.txt 2&gt;&amp;1</code></dt><dd>Detach application and send standard output and errors to <code>log.txt</code> file.</dd>
+			<dt><code>kill 12345</code></dt><dd>Send signal TERM to process with id 12345 (gracefully terminates the process)</dd>
+			<dt><code>kill -9 12345</code></dt>
+			<dt><code>kill -KILL 12345</code></dt>
+			<dd>Send signal KILL to process with id 12345 (forcefully kills the process)</dd>
+		</dl>
+
+		<hr/>
+
+
+		<h2>Tools <a href="#tools" name="tools">🔗</a></h2>
+
+		<div class="accordion mb-3" id="commands-tools">
+			<div class="accordion-item">
+				<h3 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commands-tools-body" aria-expanded="false" aria-controls="commands-tools-body">
+						Commands
+					</button>
+				</h3>
+				<div id="commands-tools-body" class="accordion-collapse collapse show" data-bs-parent="#commands-find">
+					<div class="accordion-body">
+						<dl class="row mb-0">
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/tar">tar</a></code></dt>
+							<dd class="col-10"><b>T</b>ape <b>ar</b>chive handling</dd>
+							<dt class="col-2"><code><a href="http://linux.die.net/man/1/curl">curl</a></code></dt>
+							<dd class="col-10">Perform web requests</dd>
+							<dt class="col-2"><code><a href="https://jqlang.org/">jq</a></code></dt>
+							<dd class="col-10">JSON procssor</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<p>
+		Many useful command line tools should already be known from the basics workshop.
+		This section will focus an three more tools, which allow creating and extracting archives, performing web requests, and working with JSON.
+		</p>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>
+				<code>tar</code> is an archiving utility, which can create and extract (compressed) archives and list their contents.
+				Archives can be written to and read from a file or from standard output and input, respectively.
+				Traditionally, <code>tar</code> options were specified without hyphen, but modern implementations support both forms (<code>tar tf</code> and <code>tar -tf</code>).
+				<!-- Writing to standard output might seem useless at first, but can be useful when you don't have rsync or scp around but need to stream a directory over SSH. -->
+				</p>
+			</div>
+
+			<div class="col-md-6">
+				<pre class="card card-body bg-dark text-light"><code>tar cf backup.tar dir          # create an uncompressed archive of directory "dir"
+tar tf backup.tar              # show files in archive
+tar xf backup.tar              # extract archive
+tar czf compressed.tar.gz dir  # create a compressed archive
+tar xf compressed.tar.gz       # extract compressed archive</code></pre>
+			</div>
+
+			<div class="col-md-6">
+				<p>
+				<code>curl</code> is one of the most useful tools to interact with web servers, support a wide range of protocols.
+				The most simplest form of operation is performing a simple HTTP GET request, but curl supports uploading data with a POST request too (and all other HTTP methods).
+				Users can specify and override arbitrary HTTP headers with the <code>-H</code> switch.
+				Payload data can be read from files and automatically encoded.
+				curl is indispensible when working with web APIs from the command line and greatly simplifies debugging with the <code>-v</code> (verbose) switch.
+				</p>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<pre class="card card-body bg-dark text-light"><code>curl 'example.com'
+curl -v 'example.com'
+curl 'example.com' -o downloaded.htm
+curl -H 'x-my-header: some value' 'httpbin.org/get?a=b'
+curl 'httpbin.org/post' -d 'hello'
+curl 'httpbin.org/post' --json '{"name":"Jason"}'
+curl 'httpbin.org/post' -d @filename</code></pre>
+			</div>
+
+			<div class="col-md-12">
+				<p>
+				<code>jq</code> is is a nifty little tool to filter, transform, and create JSON documents with an intuitive syntax.
+				It comes with great online documentation and a browser-based online playground with live demos.
+				</p>
+			</div>
+		</div>
+
+		<h4 class="h5">Examples</h4>
+
+		<dl>
+			<dt><code>jq '.' file.json</code></dt>
+			<dd>Pretty-print JSON file</dd>
+			<dt><code>jq -n --arg firstname 'Jason' '{name:$firstname}'</code></dt>
+			<dd>Create a new JSON document</dd>
+			<dt><code>curl -s 'https://api.github.com/events' | jq -c '.[]|{type,repo:.repo.name,user:.actor.login}'</code></dt>
+			<dd>Extract repository and username from latest GitHub events</dd>
+			<dt><code>jq -n '{name:"Jason",age:42}' | curl 'httpbin.org/post' --json @-</code></dt>
+			<dd>Build JSON document and use as payload for POST request</dd>
+		</dl>
+
+		<hr/>
+
+
+		<h2>Scripting <a href="#scripting" name="scripting">🔗</a></h2>
+
+		<p>
+		Shell commands can not only be entered interactively, but they can also be executed automatically as a script.
+		A shell script is a text file with the <em>execute</em> permission bit enabled.
+		To execute a script file, enter the path to file with at least one forward slash; for files in the current directory, you'd use <code>./scriptfile</code>.
+		When copied to a directory contained in the <code>PATH</code> variable (or by extending the variable value), the script can be executed by name only, i.e. <code>scriptfile</code>.
+		</p>
+
+		<div class="row">
+			<div class="order-2 col-xl-6 col-lg-7">
+				<pre class="card card-body bg-dark text-light"><code>#!/bin/sh
+
+# This is a comment:
+# A simple shell script
+
+name="$1"
+
+if [ -z "$name" ]; then
+	echo "Usage: $0 NAME [PARAMS]..." &gt;&amp;2
+	exit 1 # exit script with error. Any remaining commands are skipped
+else
+	echo "Hello $name!"
+fi
+
+echo 'You provided these parameters:'
+for param; do
+	echo "param = '$param'"
+done
+for countdown in 3 2 1; do
+	echo "Exiting in $countdown..."
+	sleep 1
+done
+exit 0 # exit script with succes
+</code></pre>
+			</div>
+			<div class="order-1 col-xl-6 col-lg-5">
+				<p>
+				Shell scripts usually start with the line <code>#!/bin/sh</code> (see <a href="https://en.wikipedia.org/wiki/Shebang_(Unix)">wiki:Shebang</a>).
+				This line allows setting a different interpreter, such as python, ruby, or perl.
+				Comments are introduced with <kbd>#</kbd>: anything after this character until the end of line is ignored during execution.</p>
+
+				<p>Not only can you start external programs, but you can use control structures such as <code>if</code>, <code>while</code>, or <code>for</code> as well.</p>
+				<p>
+				It's worth noting that both <code>if</code> and <code>while</code> are built around processes.
+				Do they not evaluate boolean expressions (there are no types in Shell script), but they check the exit code of the executed command.
+				An exit code of <code>0</code> means successful execution and any other exit code (usually <code>1</code>) indicates that the program exited with an error.
+				This allows for interesting and useful combinations of programs: For instance, you could run <code>if grep -q 'PATTERN' file</code> to conditionally execute code if the given pattern has been found in a file.
+				In fact, even <code>[</code> is a regular program (<code>/usr/bin/[</code>, but most often available as shell builtin) that parses the given condition and sets the exit code accordingly.
+				<code>/usr/bin/test</code> provides the same functionality as <code>[</code>.
+				</p>
+				<p>
+				To store or inspect the exit code of a command manually, access it via <code>$?</code>.
+				The exit code of a script (or a function) is the exit code of the last command executed. To manually exit a script and set the exit code, use the builtin <code>exit</code> followed by the numeric code: <code>exit 0</code> to exit successfully, and any other number to exit unsuccessfully.
+				To set the exit code for a function, use <code>return</code> followed by the numeric code instead.
+				This enables your script to be used in conditions by other scripts.
+				</p>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>
+				The <code>[</code> and <code>test</code> commands support checking several types of conditions, covering string comparisons, numeric comparisons, and file system checks.
+				Make sure to quote variables used in the expression.
+				Note that &lt; and &gt; are not valid comparison operators, because they are already reserved for IO redirection.
+				<code>test EXPRESSION</code> is equivalent to <code>[ EXPRESSION ]</code>.
+				</p>
+			</div>
+			<div class="col-md-6">
+				<pre class="card card-body bg-dark text-light"><code>test "$s" = abc # string equality
+[ "$x" -eq 42 ] # numeric equality
+[ "$x" -lt 43 ] # less than
+[ "$x" -ge 41 ] # greater than or equal
+[ -e "$file" ] # check whether file exists
+[ -f "$file" ] # check whether file is a regular file
+[ -d "$file" ] # check whether file is a directory
+[ -r "$file" ] # check whether file can be read
+[ -w "$file" ] # check whether file can be written
+[ -w "$file" ] # check whether file is executable
+[ -s "$file" ] # check whether file is non-empty
+test "$f1" -ef "$f2" # check file equality
+</code></pre>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>Commands can be conditionally chained with the <code>&amp;&amp;</code> and <code>||</code> operators. The former executes the next command only if the previous command exited successfully, while the latter executes the next command only if the previous command had failed. This is often more compact than writing an <code>if</code> block, especially when chaining only a small number of commands. <code>;</code> chains commands unconditionally, both commands are executed in sequence.</p>
+
+				<p>Noteworthy commands (and binaries) are <code>true</code> and <code>false</code>: both programs that do nothing, successfully and unsuccessfully respectively.</p>
+			</div>
+			<div class="col-md-6">
+				<pre class="card card-body bg-dark text-light"><code>true &amp;&amp; echo 'executed'
+false &amp;&amp; echo 'not executed'
+true || echo 'not executed'
+false || echo 'executed'
+true; echo 'always executed'
+false; echo 'always executed'
+# equivalent:
+if true; then
+	echo 'executed'
+fi
+</code></pre>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>
+				When comparing a value against several other values or patterns, <code>case</code> is a useful construct.
+				The first pattern that matches the value is executed and all others are skipped.
+				Each branch must be terminated with a double semicolon (<code>;;</code>).
+				Opening parentheses are optional and not required.
+				</p>
+			</div>
+			<div class="col-md-6">
+				<pre class="card card-body bg-dark text-light"><code>case "$var" in
+	static-pattern) echo 'matched static-pattern' ;;
+	(optional-opening-paren) echo 'matched optional-opening-paren' ;;
+	prefix*) echo 'possible match: prefix4' ;;
+	*suffix) echo 'possible match: 2suffix' ;;
+	multiple|patterns) echo 'matched "multiple" or "patterns"' ;;
+	[0-9]) echo 'single digit' ;;
+	[0-9]*) echo 'starting with digit' ;;
+	????) echo 'any four character value' ;;
+	*.*) echo 'value containing a dot' ;;
+	*) echo 'default case' ;;
+esac</code></pre>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>Variables can be defined by directly following the variable name with an equal sign and the desired value (<code>x=42</code>). Make sure to not put any whitespace before or after the equal sign.</p>
+
+				<p>To access the value of a variable, prefix the variable name with a dollar sign (<code>"$x"</code>). To avoid ambiguities when embedding variables in other expressions, it's generally recommended to surround the variable name with curly braces: <code>"${x}"</code>.</p>
+
+				<p>
+				As a general rule, always double quote variables when expanding them.
+				Values containing blanks or shell wildcards could otherwise lead to unexpected results.
+				Single quotes protect variables from expansion completely (<code>'$x'</code>).
+				Compare:
+				</p>
+
+			</div>
+			<div class="col-md-6">
+				<pre class="card card-body bg-dark text-light"><code>var=World
+x='  hello world    /* c-style comment */'
+echo "Hello $var!"
+echo 'Hello $var!'
+echo "Hello ${var}s"
+echo '$var has the '"value $var"
+echo 'x is $x'
+echo "x is $x"
+echo x is $x
+
+# Output:
+Hello World!
+Hello $var!
+Hello Worlds
+$var has the value World
+x is $x
+x is  hello world    /* c-style comment */
+x is hello world /bin /boot /dev /etc /home /lib /proc /root /sbin /sys /tmp /usr /var c-style comment Documents/ Downloads/ Pictures/ Videos/
+</code></pre>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>Shells provide a few simple transformations when expanding expanding variables: removing prefix or suffix patterns, and determining the length of the value. <code>#</code> removes the smallest prefix and <code>%</code> removes the smallest suffix. Doubling the modifiers will remove the largest prefix or suffix respectively.</p>
+
+			</div>
+			<div class="col-md-6">
+				<pre class="card card-body bg-dark text-light"><code>filepath=/path/to/file.txt.gz
+echo "filepath length is ${#filepath}"
+echo "extension is ${filepath##*.}"
+echo "directory is ${filepath%/*}"
+echo "without extensions ${filepath%%.*}"
+
+# Output:
+filepath length is 20
+extension is gz
+directory is /path/to
+without extensions /path/to/file</code></pre>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>Regular variables are by default scoped to the current shell process. To make variables automatically available in all new child processes, they have to be marked as environment variables with the <code>export</code> builtin command. Running <code>env</code> will show all environment variables that the current process has access to.</p>
+			</div>
+			<div class="col-md-6">
+				<pre class="card card-body bg-dark text-light"><code>pi=3
+export pi
+export pi=42 # define and export with a single command
+</code></pre>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>Useful, predefined variables in a script (or shell function):</p>
+			</div>
+			<div class="col-md-6">
+				<dl class="row">
+					<dt class="col-2"><code>$0</code></dt>
+					<dd class="col-10">The path with which the current script file was called</dd>
+					<dt class="col-2"><code>$1</code></dt>
+					<dd class="col-10">The first parameter (<code>$2</code>, …, <code>$9</code>)</dd>
+					<dt class="col-2"><code>$#</code></dt>
+					<dd class="col-10">The number of parameters</dd>
+					<dt class="col-2"><code>"$@"</code></dt>
+					<dd class="col-10">All parameters (correctly split and quoted)</dd>
+					<dt class="col-2"><code>$?</code></dt>
+					<dd class="col-10">Exit code of the last command</dd>
+				</dl>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>
+				It can be useful to use the output of a command as part of another command, e.g. to store the output of a command to a variable. This can be achieved through <em>command substitution</em>. Make sure to quote command substition to prevent word-splitting and glob expansion (same rule when expanding parameters/variables).
+				</p>
+			</div>
+			<div class="col-md-6">
+				<pre class="card card-body bg-dark text-light"><code>today="$(date -I)"
+echo "Today's date is $today"
+tar czf "/media/backups/backup-$(date -I).tgz" project-dir
+</code></pre>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>The command <code>alias</code> allows defining short names for commonly used commands. <code>unalias</code> removes existing aliases. Aliases have priority over regular programs; if no alias exists, only then will the shell search the environment variable <code>PATH</code> to find an executable to start. Aliases can be useful to set common options for commands, such as enabling colored output for <code>ls</code> or <code>grep</code>:</p>
+			</div>
+			<div class="col-md-6">
+				<pre class="card card-body bg-dark text-light"><code>alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+</code></pre>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<p>
+				Shell functions allow defining reusable code blocks that can be used like any other command.
+				Define a function by following the function name with an (empty) opening and closing parenthesis and enclose its body in curly braces.
+				There is no need (and no way) to specify the parameters that a function accepts; access function arguments via their positional index (<code>"$1"</code>, <code>"$2"</code>, etc.).
+				Shell functions are often a superior alternative to aliases.
+				</p>
+			</div>
+			<div class="col-md-6">
+				<pre class="card card-body bg-dark text-light"><code>sayhello() {
+	echo "Hello ${1}!"
+}
+
+sayhello Mario
+sayhello Peach
+
+# Output:
+Hello Mario
+Hello Peach
+</code></pre>
+			</div>
+		</div>
+
+		<p>To temporarily ignore alias definitions or functions, use the full (absolute) path to the executable (<code>/bin/ls</code>) or prefix the command with a backslash (<kbd>\</kbd>): <code>\ls</code>. Alternatively, execute via the command builtin <code>command ls</code>.</p>
+
+		<p>To define variables, functions, or aliases for any new shell process, put their definitions into the files <code>~/.profile</code> or <code>~/.bashrc</code>.</p>
+
+		<hr/>
+
+	</div>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+<script>
+	document.querySelectorAll('.accordion-collapse').forEach(el => el.classList.remove('show'));
+	document.querySelectorAll('.accordion-button').forEach(el => el.classList.add('collapsed'));
+</script>
+
+</body>
+</html>
