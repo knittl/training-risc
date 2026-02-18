@@ -29,6 +29,8 @@
 
 		h2 a[name] { visibility:hidden; }
 		h2:hover a[name] { visibility:visible; }
+
+		.text-justify { text-align: justify; }
 	</style>
 </head>
 <body>
@@ -125,7 +127,7 @@
 			<p class="mb-0">Online tutorials or sample commands usually prefix lines to be entered into the CLI with <code>$</code> only. This document follows that convention.</p>
 		</div>
 
-		<h5>Useful Keyboard Shortcuts</h5>
+		<h4 class="h5">Useful Keyboard Shortcuts</h4>
 
 		<p>Most of the time, the GNU <code>readline</code> library is used to read input from the user. Readline supports many keyboard shortcuts, including but not limited to:</p>
 
@@ -363,7 +365,7 @@ $ man echo # display the manual for the program "echo"</code></pre>
 
 		<p>The leading period of hidden files is not matched by wildcards either. If hidden files need to be matched, the period must be specified explicitly in the pattern.</p>
 
-		<h5>Examples</h5>
+		<h4 class="h5">Examples</h4>
 
 		<dl class="row">
 			<dt class="col-2"><code>*.pdf</code></dt>
@@ -436,7 +438,7 @@ $ man echo # display the manual for the program "echo"</code></pre>
 
 		<p>GNU+Linux comes with many powerful tools to transform and filter text-based data. Most programs operate on lines, reading the input line by line and printing the processed output. Input files are generally not modified.</p>
 
-		<h4>Counting Lines and Words</h4>
+		<h3 class="h4">Counting Lines and Words</h3>
 
 		<div class="row">
 			<div class="col-md-6">
@@ -464,7 +466,7 @@ $ wc -c file
 			</div>
 		</div>
 
-		<h4>Start and End of Text</h4>
+		<h3 class="h4">Start and End of Text</h3>
 
 		<div class="row">
 			<div class="col-md-6">
@@ -502,7 +504,7 @@ five</code></pre>
 			</div>
 		</div>
 
-		<h4>Extracting Fields</h4>
+		<h3 class="h4">Extracting Fields</h3>
 
 		<div class="row">
 			<div class="col-md-6">
@@ -538,7 +540,7 @@ $ cut -d: -f6- file
 			</div>
 		</div>
 
-		<h4>Sorting</h4>
+		<h3 class="h4">Sorting</h3>
 
 		<div class="alert alert-info d-flex align-items-center" role="alert">
 			<svg height="22" width="22" class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-circle"/></svg>
@@ -616,7 +618,7 @@ A:24790:Y</code></pre>
 			</div>
 		</div>
 
-		<h4>Removing Duplicates</h4>
+		<h3 class="h4">Removing Duplicates</h3>
 
 		<div class="row">
 			<div class="col-md-6">
@@ -715,7 +717,7 @@ y</code></pre>
 			<p class="mb-0">There is no confirmation when overwriting existing files!</p>
 		</div>
 
-		<h5>Examples</h5>
+		<h3 class="h5">Examples</h3>
 
 		<dl>
 			<dt><code>ls | less</code></dt>
@@ -728,7 +730,7 @@ y</code></pre>
 			<dd> Append output of <code>ping</code> to a file</dd>
 			<dt><code>echo "You executed $(wc -l &lt; ~/.bash_history) commands"</code></dt>
 			<dd> Print a message about your shell usage</dd>
-		</ul>
+		</dl>
 
 		<hr />
 
@@ -825,7 +827,7 @@ y</code></pre>
 			<p class="mb-0">Because some regex meta characters conflict with shell glob characters, the general recommendation is to quote the pattern of the grep command</p>
 		</div>
 
-		<h5>Examples</h5>
+		<h3 class="h5">Examples</h3>
 
 		<dl>
 			<dt><code>grep ':/bin/sh$' /etc/passwd</code></dt>
@@ -932,7 +934,7 @@ y</code></pre>
 
 		<p>User names and password digests are stored in the files <code>/etc/passwd</code> and <code>/etc/shadow</code>. (<a href="https://linux.die.net/man/5/passwd"><code>man 5 passwd</code></a>, <a href="https://linux.die.net/man/5/shadow"><code>man 5 shadow</code></a>)</p>
 
-		<h5>Examples</h5>
+		<h3 class="h5">Examples</h3>
 
 		<dl>
 			<dt><code>stat file</code></dt><dd>Show the permissions of the file.</dd>
@@ -968,7 +970,7 @@ y</code></pre>
 
 		<p>Package repository configuration is done via the directories in <code>/etc/apt</code>, mostly by adding files to <code>/etc/apt/sources.list.d/</code> to add additional repositories.</p>
 
-		<h5>Examples</h5>
+		<h3 class="h5">Examples</h3>
 
 		<dl>
 			<dt><code>apt update &amp;&amp; apt upgrade</code></dt><dd>Update catalog and install upgrades</dd>
@@ -977,6 +979,8 @@ y</code></pre>
 		</dl>
 
 		<hr />
+
+	</div>
 
 </div>
 </div>
